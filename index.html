@@ -81,7 +81,7 @@
             flex-direction: column;
         }
 
-        /* Canvas del fondo en movimiento */
+        /* Canvas del fondo */
         #matrixCanvas {
             position: absolute;
             top: 0;
@@ -191,41 +191,60 @@
             moveNoButton();
         });
 
-        // Configuración de la animación "LOVE YOU" descendente
+        // Configuración de las columnas continuas (arriba y abajo)
         let columns = [];
-        const fontSize = 16;
-        const text = "LOVE YOU ";
+        const fontSize = 14;
+        const text = "LOVEYOU";
 
         function initMatrix() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            const columnCount = Math.floor(canvas.width / (fontSize * 5));
+            
+            // Calculamos el ancho del texto exacto para pegarlas horizontalmente
+            ctx.font = `${fontSize}px 'Courier New', monospace`;
+            const textWidth = ctx.measureText(text).width;
+            
+            const columnCount = Math.ceil(canvas.width / textWidth);
             columns = [];
+
             for (let i = 0; i < columnCount; i++) {
-                columns[i] = Math.random() * -100; // Posición inicial aleatoria en Y
+                columns.push({
+                    x: i * textWidth,
+                    y: Math.random() * canvas.height,
+                    // Si el índice es par baja (1), si es impar sube (-1)
+                    direction: i % 2 === 0 ? 1 : -1,
+                    speed: 1.5 + Math.random() * 1 // velocidad uniforme y suave
+                });
             }
         }
 
         function drawMatrix() {
-            // Capa semitransparente para generar efecto de estela
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillStyle = '#000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            ctx.fillStyle = '#660033'; // Color de las letras de fondo
+            ctx.fillStyle = '#660033'; // Color rosa oscuro neón para el fondo
             ctx.font = `${fontSize}px 'Courier New', monospace`;
 
-            for (let i = 0; i < columns.length; i++) {
-                const x = i * (fontSize * 5);
-                const y = columns[i] * fontSize;
+            const textHeight = fontSize * 1.2;
+            const rowsNeeded = Math.ceil(canvas.height / textHeight) + 5;
 
-                ctx.fillText(text, x, y);
+            columns.forEach(col => {
+                // Actualizar la posición según su dirección
+                col.y += col.direction * col.speed;
 
-                // Reinicia la columna arriba cuando pasa el fondo
-                if (y > canvas.height && Math.random() > 0.95) {
-                    columns[i] = 0;
+                // Reiniciar al salirse del marco
+                if (col.direction === 1 && col.y > textHeight) {
+                    col.y -= textHeight;
+                } else if (col.direction === -1 && col.y < -textHeight) {
+                    col.y += textHeight;
                 }
-                columns[i]++;
-            }
+
+                // Dibujar una tira continua vertical sin espacios vacíos
+                for (let r = -2; r < rowsNeeded; r++) {
+                    ctx.fillText(text, col.x, col.y + (r * textHeight));
+                }
+            });
+
             requestAnimationFrame(drawMatrix);
         }
 
@@ -241,5 +260,3 @@
     </script>
 </body>
 </html>
-
-            
