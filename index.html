@@ -22,7 +22,7 @@
             overflow: hidden;
         }
 
-        /* Pantalla 1: Cuadro Pregunta */
+        /* Pantalla 1: Tarjeta con Pregunta */
         .card {
             border: 3px solid #fff;
             padding: 40px 30px;
@@ -66,7 +66,7 @@
             left: 170px;
         }
 
-        /* Pantalla 2: Animación de Amor */
+        /* Pantalla 2: Animación */
         .love-screen {
             display: none;
             position: absolute;
@@ -74,27 +74,21 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-color: #050003;
+            background-color: #000;
             overflow: hidden;
             justify-content: center;
             align-items: center;
             flex-direction: column;
         }
 
-        /* Fondo repetido de "LOVE YOU" */
-        .bg-text {
+        /* Canvas del fondo en movimiento */
+        #matrixCanvas {
             position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            display: flex;
-            flex-wrap: wrap;
-            font-size: 12px;
-            color: #4a0024;
-            opacity: 0.6;
-            user-select: none;
-            line-height: 16px;
             z-index: 1;
-            word-break: break-all;
         }
 
         /* Corazón y Texto Central */
@@ -156,7 +150,7 @@
 </head>
 <body>
 
-    <!-- PANTALLA DE PREGUNTA -->
+    <!-- PREGUNTA -->
     <div class="card" id="card">
         <h1>Do you love me?</h1>
         <div class="btn-container">
@@ -165,9 +159,9 @@
         </div>
     </div>
 
-    <!-- PANTALLA DE AMOR INTERACTIVA -->
+    <!-- PANTALLA CON MOVIMIENTO -->
     <div class="love-screen" id="loveScreen">
-        <div class="bg-text" id="bgText"></div>
+        <canvas id="matrixCanvas"></canvas>
         <div class="heart-container">
             <div class="love-title">LOVE YOU</div>
             <div class="heart"></div>
@@ -179,9 +173,10 @@
         const noBtn = document.getElementById('noBtn');
         const card = document.getElementById('card');
         const loveScreen = document.getElementById('loveScreen');
-        const bgText = document.getElementById('bgText');
+        const canvas = document.getElementById('matrixCanvas');
+        const ctx = canvas.getContext('2d');
 
-        // Lógica para escapar con el botón "No"
+        // Lógica de escape del botón "No"
         function moveNoButton() {
             const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 40);
             const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - 40);
@@ -190,28 +185,61 @@
             noBtn.style.top = `${y}px`;
         }
 
-        // El botón escapa al pasar el mouse o tocarlo en celular
         noBtn.addEventListener('mouseover', moveNoButton);
         noBtn.addEventListener('touchstart', (e) => {
             e.preventDefault();
             moveNoButton();
         });
 
-        // Generar el fondo con texto "LOVE YOU " repetido
-        function generateBackground() {
-            let text = "";
-            for (let i = 0; i < 1500; i++) {
-                text += "LOVE YOU ";
+        // Configuración de la animación "LOVE YOU" descendente
+        let columns = [];
+        const fontSize = 16;
+        const text = "LOVE YOU ";
+
+        function initMatrix() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const columnCount = Math.floor(canvas.width / (fontSize * 5));
+            columns = [];
+            for (let i = 0; i < columnCount; i++) {
+                columns[i] = Math.random() * -100; // Posición inicial aleatoria en Y
             }
-            bgText.innerText = text;
+        }
+
+        function drawMatrix() {
+            // Capa semitransparente para generar efecto de estela
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#660033'; // Color de las letras de fondo
+            ctx.font = `${fontSize}px 'Courier New', monospace`;
+
+            for (let i = 0; i < columns.length; i++) {
+                const x = i * (fontSize * 5);
+                const y = columns[i] * fontSize;
+
+                ctx.fillText(text, x, y);
+
+                // Reinicia la columna arriba cuando pasa el fondo
+                if (y > canvas.height && Math.random() > 0.95) {
+                    columns[i] = 0;
+                }
+                columns[i]++;
+            }
+            requestAnimationFrame(drawMatrix);
         }
 
         // Al presionar "Yes"
         yesBtn.addEventListener('click', () => {
             card.style.display = 'none';
             loveScreen.style.display = 'flex';
-            generateBackground();
+            initMatrix();
+            drawMatrix();
         });
+
+        window.addEventListener('resize', initMatrix);
     </script>
 </body>
 </html>
+
+            
