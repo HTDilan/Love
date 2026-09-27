@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Do you love me? ❤️</title>
+    <!-- Vinculación del archivo CSS externo -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- PREGUNTA -->
+    <div class="card" id="card">
+        <h1>Do you love me?</h1>
+        <div class="btn-container">
+            <button id="yesBtn">Yes</button>
+            <button id="noBtn">No</button>
+        </div>
+    </div>
+
+    <!-- PANTALLA DE ANIMACIÓN -->
+    <div class="love-screen" id="loveScreen">
+        <canvas id="matrixCanvas"></canvas>
+        <div class="heart-container">
+            <div class="love-title">LOVE YOU</div>
+            <div class="heart"></div>
+        </div>
+    </div>
+
+    <script>
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const card = document.getElementById('card');
+        const loveScreen = document.getElementById('loveScreen');
+        const canvas = document.getElementById('matrixCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function moveNoButton() {
+            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 40);
+            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - 40);
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = `${x}px`;
+            noBtn.style.top = `${y}px`;
+        }
+
+        noBtn.addEventListener('mouseover', moveNoButton);
+        noBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            moveNoButton();
+        });
+
+        let columns = [];
+        const fontSize = 15;
+        const text = "LOVE YOU ";
+
+        function initMatrix() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            ctx.font = `bold ${fontSize}px 'Courier New', monospace`;
+            const textWidth = ctx.measureText(text).width;
+            
+            const columnCount = Math.ceil(canvas.width / textWidth);
+            columns = [];
+
+            for (let i = 0; i < columnCount; i++) {
+                columns.push({
+                    x: i * textWidth,
+                    y: Math.random() * canvas.height,
+                    direction: i % 2 === 0 ? 1 : -1,
+                    speed: 1.8
+                });
+            }
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#880044'; 
+            ctx.font = `bold ${fontSize}px 'Courier New', monospace`;
+
+            const textHeight = fontSize * 1.3;
+            const rowsNeeded = Math.ceil(canvas.height / textHeight) + 4;
+
+            columns.forEach(col => {
+                col.y += col.direction * col.speed;
+
+                if (col.direction === 1 && col.y > textHeight) {
+                    col.y -= textHeight;
+                } else if (col.direction === -1 && col.y < -textHeight) {
+                    col.y += textHeight;
+                }
+
+                for (let r = -2; r < rowsNeeded; r++) {
+                    ctx.fillText(text, col.x, col.y + (r * textHeight));
+                }
+            });
+
+            requestAnimationFrame(drawMatrix);
+        }
+
+        yesBtn.addEventListener('click', () => {
+            card.style.display = 'none';
+            loveScreen.style.display = 'flex';
+            initMatrix();
+            drawMatrix();
+        });
+
+        window.addEventListener('resize', initMatrix);
+    </script>
+</body>
+</html>
