@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Do you love me? ❤️</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Pantalla 1: Cuadro Pregunta */
+        .card {
+            border: 3px solid #fff;
+            padding: 40px 30px;
+            text-align: center;
+            background-color: #000;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+            position: relative;
+            z-index: 10;
+            min-width: 320px;
+        }
+
+        .card h1 {
+            font-size: 26px;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            position: relative;
+            height: 50px;
+        }
+
+        button {
+            padding: 10px 25px;
+            font-size: 18px;
+            font-weight: bold;
+            border: 2px solid #fff;
+            background: #fff;
+            color: #000;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+
+        #noBtn {
+            position: absolute;
+            background: #000;
+            color: #fff;
+            left: 170px;
+        }
+
+        /* Pantalla 2: Animación de Amor */
+        .love-screen {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #050003;
+            overflow: hidden;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        /* Fondo repetido de "LOVE YOU" */
+        .bg-text {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            font-size: 12px;
+            color: #4a0024;
+            opacity: 0.6;
+            user-select: none;
+            line-height: 16px;
+            z-index: 1;
+            word-break: break-all;
+        }
+
+        /* Corazón y Texto Central */
+        .heart-container {
+            position: relative;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: pulse 1.2s infinite alternate ease-in-out;
+        }
+
+        .heart {
+            background-color: #ff007f;
+            display: inline-block;
+            height: 100px;
+            margin: 0 10px;
+            position: relative;
+            transform: rotate(-45deg);
+            width: 100px;
+            box-shadow: 0 0 40px #ff007f, 0 0 80px #ff007f;
+        }
+
+        .heart:before,
+        .heart:after {
+            content: "";
+            background-color: #ff007f;
+            border-radius: 50%;
+            height: 100px;
+            position: absolute;
+            width: 100px;
+            box-shadow: 0 0 40px #ff007f;
+        }
+
+        .heart:before {
+            top: -50px;
+            left: 0;
+        }
+
+        .heart:after {
+            left: 50px;
+            top: 0;
+        }
+
+        .love-title {
+            color: #fff;
+            font-size: 42px;
+            font-weight: 900;
+            margin-bottom: 30px;
+            text-shadow: 0 0 20px #ff007f, 0 0 40px #ff007f;
+            letter-spacing: 4px;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); }
+            100% { transform: scale(1.1); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PANTALLA DE PREGUNTA -->
+    <div class="card" id="card">
+        <h1>Do you love me?</h1>
+        <div class="btn-container">
+            <button id="yesBtn">Yes</button>
+            <button id="noBtn">No</button>
+        </div>
+    </div>
+
+    <!-- PANTALLA DE AMOR INTERACTIVA -->
+    <div class="love-screen" id="loveScreen">
+        <div class="bg-text" id="bgText"></div>
+        <div class="heart-container">
+            <div class="love-title">LOVE YOU</div>
+            <div class="heart"></div>
+        </div>
+    </div>
+
+    <script>
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const card = document.getElementById('card');
+        const loveScreen = document.getElementById('loveScreen');
+        const bgText = document.getElementById('bgText');
+
+        // Lógica para escapar con el botón "No"
+        function moveNoButton() {
+            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 40);
+            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - 40);
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = `${x}px`;
+            noBtn.style.top = `${y}px`;
+        }
+
+        // El botón escapa al pasar el mouse o tocarlo en celular
+        noBtn.addEventListener('mouseover', moveNoButton);
+        noBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            moveNoButton();
+        });
+
+        // Generar el fondo con texto "LOVE YOU " repetido
+        function generateBackground() {
+            let text = "";
+            for (let i = 0; i < 1500; i++) {
+                text += "LOVE YOU ";
+            }
+            bgText.innerText = text;
+        }
+
+        // Al presionar "Yes"
+        yesBtn.addEventListener('click', () => {
+            card.style.display = 'none';
+            loveScreen.style.display = 'flex';
+            generateBackground();
+        });
+    </script>
+</body>
+</html>
